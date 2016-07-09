@@ -29,10 +29,13 @@ module PivottablesHelper
       time = e.event_datetime
       zone = User.current.time_zone
       local = zone ? time.in_time_zone(zone) : (time.utc? ? time.localtime : time)
+      project = e.project.name
 
       result_list.push({l("field_activity") => activity,
                         ID:e.id, 
                         l("field_author") => author, 
+                        l("field_project") => project, 
+                        l("field_hours") => hours, 
                         l("field_title") => title,
                         l("field_created_on") => local,
                         l("field_created_on")+"(y)" => local.year,

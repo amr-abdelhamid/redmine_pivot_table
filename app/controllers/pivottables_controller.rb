@@ -11,6 +11,8 @@ class PivottablesController < ApplicationController
   include SortHelper
   include IssuesHelper
 
+  ISSUES_LIMIT = 10000
+
   def pivottables
   end
 
@@ -49,8 +51,7 @@ class PivottablesController < ApplicationController
     if (params[:table] == "activity")
       @days = Setting.activity_days_default.to_i
       @with_subprojects = Setting.display_subprojects_issues?
-      @activity = Redmine::Activity::Fetcher.new(User.current, :project => @project,
-                                                               :with_subprojects => @with_subprojects)
+      @activity = Redmine::Activity::Fetcher.new(User.current, :with_subprojects => @with_subprojects)
       @events = @activity.events(Date.today - @days, Date.today + 1)
     else
       @query.project = @project
@@ -62,9 +63,11 @@ class PivottablesController < ApplicationController
           @query.add_filter("status_id", "*", [''])
       end
 
+      @query.project = nil
       @issues = @query.issues(:include => [:assigned_to, :tracker, :priority, :category, :fixed_version],
                               :offset => 0,
-                              :limit => 1000)
+                              :limit => ISSUES_LIMIT)
+      @query.project = @project
     end
   end
 
